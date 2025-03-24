@@ -6,6 +6,7 @@ package com.mycompany.projet_jeux;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -14,6 +15,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 /**
  *
  * @author yasmi
@@ -52,8 +54,11 @@ public class LettersPanel extends JPanel {
                     boolean correct = motsPanel.devinerLettre(letter);
                     button.setEnabled(false);
                     if (!correct) {
-                    imagePanel.incrementerErreurs();
+                        imagePanel.incrementerErreurs();
                     }
+                    // Appel de la méthode verifier pour vérifier l'état du jeu après chaque tentative
+                    SwingUtilities.getWindowAncestor(this).repaint(); // Met à jour l'interface graphique
+                    ((PenduFrame) SwingUtilities.getWindowAncestor(this)).verifier();
                 });
 
                 linePanel.add(button); // Ajouter le bouton à la ligne
@@ -64,5 +69,20 @@ public class LettersPanel extends JPanel {
 
         // Fixer une hauteur minimale pour éviter que le panneau s'étire trop
         this.setPreferredSize(new Dimension(600, 200));
+        
     }
+    public void resetBoutons(){
+        // Réactivation des boutons désactivés
+        for (Component comp : this.getComponents()) {
+            if (comp instanceof JPanel) {
+                for (Component button : ((JPanel) comp).getComponents()) {
+                    if (button instanceof JButton) {
+                        button.setEnabled(true); // Réactivation du bouton
+                    }
+                }
+            }
+        }
+    }
+
 }
+    
