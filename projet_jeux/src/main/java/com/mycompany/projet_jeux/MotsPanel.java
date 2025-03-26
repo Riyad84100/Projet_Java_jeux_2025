@@ -11,6 +11,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -28,18 +30,33 @@ public class MotsPanel extends JPanel {
     private char[] motAffiche;
     private JLabel motLabel;
 
-     
-    public MotsPanel() {  
+    private ArrayList<String> motsList = new ArrayList<>(); // Liste des mots chargés depuis le fichier.
 
+    public MotsPanel() {
         setLayout(new FlowLayout(FlowLayout.CENTER));
-        nouveauMot();
+        chargerMotsDepuisFichier("C:\\Users\\yasmi\\Downloads\\mots.txt"); // Charger les mots depuis un fichier texte
+        nouveauMot(); // Démarrer avec un mot
     }
 
+    // Charger les mots depuis un fichier texte
+    private void chargerMotsDepuisFichier(String cheminFichier) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(cheminFichier))) {
+            String ligne;
+            while ((ligne = reader.readLine()) != null) {
+                motsList.add(ligne.trim()); // Ajouter chaque mot (trim pour enlever les espaces)
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur lors du chargement du fichier des mots : " + e.getMessage());
+        }
+    }
+
+    // Choisir un mot aléatoire depuis la liste chargée
     private String choisirMot() {
-        ArrayList<String> mots = new ArrayList<>(Arrays.asList(
-            "JAVA", "SWING", "PANEL", "PROGRAMMATION", "ORDINATEUR", "PENDU"
-        ));
-        return mots.get(new Random().nextInt(mots.size()));
+        if (motsList.isEmpty()) {
+            System.err.println("La liste des mots est vide !");
+            return "";
+        }
+        return motsList.get(new Random().nextInt(motsList.size()));
     }
 
     public void nouveauMot() {
