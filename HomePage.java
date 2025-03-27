@@ -13,6 +13,7 @@ import java.io.File;
 
 public class HomePage extends JFrame {
     private String selectedDifficulty = null; // Stocke la difficulté sélectionnée
+    private String selectedGame = null; // Stocke le jeu sélectionné
     private MediaView mediaView; // Référence au MediaView pour le redimensionnement
     private JFXPanel fxPanel; // Référence au JFXPanel pour le redimensionnement
     private MediaPlayer mediaPlayer; // Référence au MediaPlayer pour relancer la vidéo
@@ -70,26 +71,32 @@ public class HomePage extends JFrame {
 
         // Options de jeux
         JMenuItem magicSlateMenuItem = new JMenuItem("Jeux ardoise magique");
-        JMenuItem game1MenuItem = new JMenuItem("Jeu de Calcul");
+        JMenuItem calculGameMenuItem = new JMenuItem("Jeu de calcul");
+        JMenuItem penduMenuItem = new JMenuItem("Jeu du pendu");
         JMenuItem game2MenuItem = new JMenuItem("Jeu 2 (à venir)");
 
         // Gestion des clics sur les options de jeux
         magicSlateMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (selectedDifficulty == null) {
-                    JOptionPane.showMessageDialog(HomePage.this, "Veuillez choisir une difficulté !", "Erreur", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    // Lancer le jeu avec la difficulté sélectionnée
-                    launchGame(selectedDifficulty);
-                }
+                selectedGame = "Jeux ardoise magique";
+                checkAndLaunchGame();
             }
         });
 
-        game1MenuItem.addActionListener(new ActionListener() {
+        calculGameMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(HomePage.this, "Jeu 1 - En développement", "Information", JOptionPane.INFORMATION_MESSAGE);
+                selectedGame = "Jeu de calcul";
+                checkAndLaunchGame();
+            }
+        });
+
+        penduMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectedGame = "Jeu du pendu";
+                checkAndLaunchGame();
             }
         });
 
@@ -102,7 +109,8 @@ public class HomePage extends JFrame {
 
         // Ajouter les options au menu des jeux
         gamesMenu.add(magicSlateMenuItem);
-        gamesMenu.add(game1MenuItem);
+        gamesMenu.add(calculGameMenuItem);
+        gamesMenu.add(penduMenuItem);
         gamesMenu.add(game2MenuItem);
 
         // Ajouter les menus à la barre de menus
@@ -126,6 +134,17 @@ public class HomePage extends JFrame {
                 });
             }
         });
+    }
+
+    /**
+     * Vérifie les conditions et lance le jeu sélectionné
+     */
+    private void checkAndLaunchGame() {
+        if (selectedDifficulty == null) {
+            JOptionPane.showMessageDialog(HomePage.this, "Veuillez choisir une difficulté !", "Erreur", JOptionPane.ERROR_MESSAGE);
+        } else {
+            launchGame(selectedDifficulty);
+        }
     }
 
     /**
@@ -171,9 +190,17 @@ public class HomePage extends JFrame {
         // Masquer la page d'accueil au lieu de la fermer
         setVisible(false);
 
-        // Créer et afficher la fenêtre de jeu
-        DisplayPanel gameFrame = new DisplayPanel(difficulty, this); // Passer la référence de HomePage
-        gameFrame.setVisible(true);
+        // Créer et afficher la fenêtre de jeu appropriée
+        if ("Jeux ardoise magique".equals(selectedGame)) {
+            DisplayPanel gameFrame = new DisplayPanel(difficulty, this); // Passer la référence de HomePage
+            gameFrame.setVisible(true);
+        } else if ("Jeu de calcul".equals(selectedGame)) {
+            ActiviteCalcul gameFrame = new ActiviteCalcul(difficulty, this); // Passer la référence de HomePage
+            gameFrame.setVisible(true);
+        } else if ("Jeu du pendu".equals(selectedGame)) {
+            PenduFrame gameFrame = new PenduFrame(); // Créer une nouvelle instance du jeu du pendu
+            gameFrame.setVisible(true);
+        }
     }
 
     /**
