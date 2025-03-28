@@ -1,8 +1,12 @@
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 class Tableau extends JPanel {
@@ -10,6 +14,7 @@ class Tableau extends JPanel {
     private int strokeWidth = 5; // Largeur par défaut du stylo
     private final List<Shape> shapes = new ArrayList<>();
     private Point lastPoint = null;
+    private BufferedImage backgroundImage = null; // Add a field for the background image
 
     public Tableau() {
         setBackground(Color.WHITE);
@@ -55,6 +60,61 @@ class Tableau extends JPanel {
         repaint();
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
+    public void saveImage() {
+        BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        paint(g2d); // Paint the current content of the panel onto the BufferedImage
+        g2d.dispose();
+
+        File outputDir = new File("src/dessin");
+        if (!outputDir.exists()) {
+            outputDir.mkdirs(); // Create the directory if it doesn't exist
+        }
+
+        // Find the next available filename with an incremented counter
+        int counter = 1;
+        File outputFile;
+        do {
+            outputFile = new File(outputDir, "drawing_" + counter + ".png");
+            counter++;
+        } while (outputFile.exists());
+
+        try {
+            ImageIO.write(image, "png", outputFile);
+            System.out.println("Image saved to: " + outputFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to save the image.");
+        }
+    }
+
+    public void loadImage(String filename) {
+        File inputFile = new File("src/dessin/" + filename);
+        if (!inputFile.exists()) {
+            System.err.println("File not found: " + inputFile.getAbsolutePath());
+            return;
+        }
+
+        try {
+            backgroundImage = ImageIO.read(inputFile); // Load the image as the background
+            repaint(); // Repaint the panel to display the background
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to load the image.");
+        }
+    }
+
+    public String[] listSavedDrawings() {
+        File outputDir = new File("src/dessin");
+        if (!outputDir.exists() || !outputDir.isDirectory()) {
+            return new String[0]; // Return an empty array if the directory doesn't exist
+        }
+
+        // List all PNG files in the directory
+        return outputDir.list((dir, name) -> name.endsWith(".png"));
+    }
+
     public List<Shape> getShapes() {
         return shapes;
     }
@@ -63,6 +123,13 @@ class Tableau extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+
+        // Draw the background image if it exists
+        if (backgroundImage != null) {
+            g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+        }
+
+        // Draw the shapes on top of the background
         for (Shape s : shapes) {
             g2d.setColor(s.color);
             g2d.setStroke(new BasicStroke(s.strokeWidth)); // Utiliser la largeur du stylo

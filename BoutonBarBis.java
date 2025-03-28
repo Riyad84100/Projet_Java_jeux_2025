@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.io.File;
 
 public class BoutonBarBis extends JPanel {
     @SuppressWarnings("unused")
@@ -26,7 +27,8 @@ public class BoutonBarBis extends JPanel {
         JButton eraserButton = new JButton();
         JButton resetButton = new JButton();
         JButton sizeButton = new JButton(); // Bouton pour régler la largeur du stylo
-
+        JButton saveButton = new JButton("Save"); // Bouton pour enregistrer l'image
+        JButton loadButton = new JButton("Load"); // Bouton pour charger une image
         // Charger les images pour les boutons
         loadButtonIcon(greenButton, "src/images/vert.png", 60, 60);
         loadButtonIcon(redButton, "src/images/rouge.png", 60, 60);
@@ -34,14 +36,37 @@ public class BoutonBarBis extends JPanel {
         loadButtonIcon(eraserButton, "src/images/eraser.png", 60, 60);
         loadButtonIcon(resetButton, "src/images/bin.png", 60, 60);
         loadButtonIcon(rgbButton, "src/images/ciel.png", 60, 60);
-        loadButtonIcon(sizeButton, "src/images/stilet.png", 60, 60); // Charger l'image pour le bouton de taille
-
+        loadButtonIcon(sizeButton, "src/images/height.png", 60, 60); // Charger l'image pour le bouton de taille
+        loadButtonIcon(saveButton, "src/images/save.png", 60, 60); // Charger l'image pour le bouton d'enregistrement
+        loadButtonIcon(loadButton, "src/images/load.png", 60, 60); // Charger l'image pour le bouton de chargement
         // Ajouter les écouteurs d'événements
         greenButton.addActionListener(e -> tableau.setColor(Color.GREEN));
         redButton.addActionListener(e -> tableau.setColor(Color.RED));
         blueButton.addActionListener(e -> tableau.setColor(Color.BLUE));
         eraserButton.addActionListener(e -> tableau.setColor(Color.WHITE));
         resetButton.addActionListener(e -> tableau.reset());
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableau.saveImage(); // Call saveImage on the Tableau instance
+            }
+        });
+        loadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Open a file chooser to select a drawing to load
+                JFileChooser fileChooser = new JFileChooser(new File("src/dessin"));
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setDialogTitle("Select a Drawing to Load");
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("PNG Images", "png"));
+
+                int result = fileChooser.showOpenDialog(BoutonBarBis.this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    tableau.loadImage(selectedFile.getName()); // Load the selected drawing
+                }
+            }
+        });
 
         // Configurer le bouton RGB Color pour ouvrir un JColorChooser
         rgbButton.addActionListener(new ActionListener() {
@@ -77,6 +102,8 @@ public class BoutonBarBis extends JPanel {
         add(eraserButton);
         add(resetButton);
         add(sizeButton);
+        add(saveButton);
+        add(loadButton);   
     }
 
     /**
