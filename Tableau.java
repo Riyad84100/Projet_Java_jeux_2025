@@ -15,6 +15,7 @@ class Tableau extends JPanel {
     private final List<Shape> shapes = new ArrayList<>();
     private Point lastPoint = null;
     private BufferedImage backgroundImage = null; // Add a field for the background image
+    private String currentFileName = null; // Variable pour stocker le nom du fichier chargé
 
     public Tableau() {
         setBackground(Color.WHITE);
@@ -72,13 +73,19 @@ class Tableau extends JPanel {
             outputDir.mkdirs(); // Create the directory if it doesn't exist
         }
 
-        // Find the next available filename with an incremented counter
-        int counter = 1;
         File outputFile;
-        do {
-            outputFile = new File(outputDir, "drawing_" + counter + ".png");
-            counter++;
-        } while (outputFile.exists());
+        if (currentFileName != null) {
+            // Utiliser le nom de fichier existant
+            outputFile = new File(outputDir, currentFileName);
+        } else {
+            // Trouver un nouveau nom de fichier si aucun fichier n'est chargé
+            int counter = 1;
+            do {
+                outputFile = new File(outputDir, "drawing_" + counter + ".png");
+                counter++;
+            } while (outputFile.exists());
+            currentFileName = outputFile.getName(); // Mettre à jour le nom du fichier actuel
+        }
 
         try {
             ImageIO.write(image, "png", outputFile);
@@ -98,6 +105,7 @@ class Tableau extends JPanel {
 
         try {
             backgroundImage = ImageIO.read(inputFile); // Load the image as the background
+            currentFileName = filename; // Mettre à jour le nom du fichier actuel
             repaint(); // Repaint the panel to display the background
         } catch (IOException e) {
             e.printStackTrace();
@@ -105,6 +113,7 @@ class Tableau extends JPanel {
         }
     }
 
+    @SuppressWarnings("unused")
     public String[] listSavedDrawings() {
         File outputDir = new File("src/dessin");
         if (!outputDir.exists() || !outputDir.isDirectory()) {

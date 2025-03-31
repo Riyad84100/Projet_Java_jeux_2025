@@ -7,9 +7,9 @@ import javax.swing.event.ChangeListener;
 import java.io.File;
 
 public class BoutonBarBis extends JPanel {
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldMayBeFinal"})
     private Tableau tableau;
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldMayBeFinal"})
     private String difficulty;
 
     @SuppressWarnings("unused")
@@ -94,16 +94,19 @@ public class BoutonBarBis extends JPanel {
             add(greenButton);
             add(redButton);
             add(blueButton);
+            add(eraserButton);
+            add(resetButton);
+            add(sizeButton);
         } else if (difficulty.equals("difficile")) {
             add(rgbButton);
+            add(eraserButton);
+            add(resetButton);
+            add(sizeButton);
+            add(saveButton);
+            add(loadButton); 
         }
 
-        // Ajouter la gomme, le reset et le bouton de taille dans tous les cas
-        add(eraserButton);
-        add(resetButton);
-        add(sizeButton);
-        add(saveButton);
-        add(loadButton);   
+          
     }
 
     /**
